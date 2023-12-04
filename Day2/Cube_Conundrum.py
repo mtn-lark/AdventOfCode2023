@@ -28,7 +28,7 @@ class Trial:
             else:
                 raise (ValueError(f"Invalid color: {color[0]}"))
 
-    def __str__(self):
+    def __str__(self) -> str:
         return f"Red: {self.red}\nGreen: {self.green}\nBlue: {self.blue}"
 
 
@@ -63,7 +63,7 @@ class Game:
         self._max_green_count = max_green_count
         self._max_blue_count = max_blue_count
 
-    def __str__(self):
+    def __str__(self) -> str:
         trial_index = 0
         result = ""
         for trial in self.trials:
@@ -73,7 +73,7 @@ class Game:
         return result
 
     # Instance method
-    def is_valid(self):
+    def is_valid(self) -> bool:
         if self._max_red_count > MAX_RED:
             return False
         if self._max_green_count > MAX_GREEN:
@@ -82,8 +82,12 @@ class Game:
             return False
         return True
 
+    def get_power(self) -> int:
+        return self._max_red_count * self._max_green_count * self._max_blue_count
 
-running_sum = 0
+
+running_sum_part_1 = 0
+running_sum_part_2 = 0
 game = 0
 
 # Part 1
@@ -97,6 +101,8 @@ with open(FILE_PATH, "r") as file:
 
         game_data = Game(game_raw_data=game_raw_data)
         if game_data.is_valid():
-            running_sum += game
+            running_sum_part_1 += game
+        running_sum_part_2 += game_data.get_power()
 
-print(running_sum)
+print(running_sum_part_1)
+print(running_sum_part_2)
