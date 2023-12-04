@@ -2,8 +2,9 @@ from typing import List
 
 FILE_PATH = "Day2/day2input.txt"
 
-running_sum = 0
-game = 0
+MAX_RED = 12
+MAX_GREEN = 13
+MAX_BLUE = 14
 
 
 class Trial:
@@ -25,7 +26,7 @@ class Trial:
             elif color[1] == "blue":
                 self.blue = int(color[0])
             else:
-                raise (ValueError("Invalid color"))
+                raise (ValueError(f"Invalid color: {color[0]}"))
 
     def __str__(self):
         return f"Red: {self.red}\nGreen: {self.green}\nBlue: {self.blue}"
@@ -34,34 +35,68 @@ class Trial:
 class Game:
     # Class Variables
     trials: List[Trial] = []
+    _max_red_count = 0
+    _max_green_count = 0
+    _max_blue_count = 0
 
     # Constructor method
     def __init__(self, game_raw_data) -> None:
         trials = []
+        max_red_count = 0
+        max_green_count = 0
+        max_blue_count = 0
         # Separate each trial
         trials_data = game_raw_data.split(";")
-        for trial in trials_data:
-            trials.append(Trial(trial))
+        for trial_datum in trials_data:
+            trial = Trial(trial_datum)
+            trials.append(trial)
+            # Update maximum counts (for later validation)
+            if trial.red > max_red_count:
+                max_red_count = trial.red
+            if trial.green > max_green_count:
+                max_green_count = trial.green
+            if trial.blue > max_blue_count:
+                max_blue_count = trial.blue
 
         self.trials = trials
+        self._max_red_count = max_red_count
+        self._max_green_count = max_green_count
+        self._max_blue_count = max_blue_count
+
+    def __str__(self):
+        trial_index = 0
+        result = ""
+        for trial in self.trials:
+            result += f"* Trial {trial_index} *\n"
+            result += str(trial) + "\n"
+            trial_index += 1
+        return result
+
+    # Instance method
+    def is_valid(self):
+        if self._max_red_count > MAX_RED:
+            return False
+        if self._max_green_count > MAX_GREEN:
+            return False
+        if self._max_blue_count > MAX_BLUE:
+            return False
+        return True
 
 
-def check_possible_game():
-    print("hello")
-
+running_sum = 0
+game = 0
 
 # Part 1
-with open(file_path, "r") as file:
+with open(FILE_PATH, "r") as file:
     for line in file:
         game += 1
 
-        # First, separate the game from the data
+        # Separate the data
         colon_index = line.find(":")
         game_raw_data = line[colon_index + 1 : -1]
 
-        # Then, separate each trial
-        trials = game_raw_data.split(";")
-        print(trials)
-        print(Trial(trial_raw_data=trials[0]))
-        if game == 1:
-            break
+        game_data = Game(game_raw_data=game_raw_data)
+        if game_data.is_valid():
+            running_sum += game
+
+print(running_sum)
