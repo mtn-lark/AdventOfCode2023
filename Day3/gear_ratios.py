@@ -1,9 +1,18 @@
+from typing import Dict, List
+
 FILE_PATH = "Day3/day3input.txt"
 # FILE_PATH = "Day3/day3example.txt"
 
-lines = []
-line_length = 0
-num_lines = 0
+# File global vars
+lines: List[str] = []
+line_length: int = 0
+num_lines: int = 0
+
+
+def is_symbol(char: str) -> bool:
+    if not char.isdigit() and char != "." and char != "\n":
+        return True
+    return False
 
 
 def is_part(row_index: int, start_index: int, end_index: int) -> bool:
@@ -14,8 +23,9 @@ def is_part(row_index: int, start_index: int, end_index: int) -> bool:
     assert number_string.isdigit()
 
     # Check adjacent spots for symbol
-    # Top and bottom rows
-    for r in range(row_index - 1, (row_index + 1) + 1, 2):
+    # This also checks the spots the number is in, but those will never read as
+    # symbols.
+    for r in range(row_index - 1, (row_index + 1) + 1):
         # Make sure row is valid
         if r >= 0 and r < num_lines:
             # Iterate through characters
@@ -24,25 +34,8 @@ def is_part(row_index: int, start_index: int, end_index: int) -> bool:
                 if i >= 0 and i < line_length:
                     # Get character
                     char = lines[r][i]
-                    if not char.isdigit() and char != "." and char != "\n":
-                        # Symbol found! Not digit or .
+                    if is_symbol(char):
                         return True
-
-    # Char to the left of number
-    # Make sure it is in bounds
-    if start_index - 1 >= 0:
-        left_char = lines[row_index][start_index - 1]
-        if not left_char.isdigit() and left_char != "." and left_char != "\n":
-            # Symbol found! Not digit or .
-            return True
-
-    # Char to the right of number
-    # Make sure it is in bounds
-    if end_index + 1 < line_length:
-        right_char = lines[row_index][end_index + 1]
-        if not right_char.isdigit() and right_char != "." and right_char != "\n":
-            # Symbol found! Not digit or .
-            return True
 
     # Symbol not found in scan
     return False
@@ -57,14 +50,14 @@ file.close()
 line_length = len(lines[0])
 num_lines = len(lines) - 1  # Empty line
 
-running_sum = 0
-row_index = 0
+running_sum: int = 0
+row_index: int = 0
 parts = set()
 for line in lines:
     # Start/end indices are -1 if currently reading a non-digit.
-    current_index = 0
-    start_index = -1
-    end_index = -1
+    current_index: int = 0
+    start_index: int = -1
+    end_index: int = -1
 
     # Read numbers in line by reading each character
     for char in line:
