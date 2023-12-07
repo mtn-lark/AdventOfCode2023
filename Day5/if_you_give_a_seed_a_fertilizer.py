@@ -137,3 +137,59 @@ def merge_sort_list(int_list: List[int]) -> List[int]:
     merge = merge_list(left, right)
 
     return merge
+
+
+def map_via_merge_sort(
+    int_list: List[int], map_list: List[Tuple[int, int, int]]
+) -> List[int]:
+    """Maps a sorted list of integers using a sorted list of mappings.
+    Maps are organized (destination range start, source range start, range length).
+
+    Args:
+        int_list (List[int]): Sorted list of integers
+        map_list (List[Tuple[int, int, int]]): Sorted list of mappings
+
+    Returns:
+        List[int]: Mapped list of integers
+    """
+
+    i = 0  # int list pointer index
+    m = 0  # map list pointer index
+
+    new_list = []
+    while i < len(int_list) and m < len(map_list):
+        curr_int = int_list[i]
+        curr_map = map_list[m]
+        curr_map_source_range_start = curr_map[1]
+
+        # Need to check if integer is in range for map, so if its above the map
+        # source range start
+        if curr_int < curr_map_source_range_start:
+            # We know both lists are sorted. So, if the integer is smaller than
+            # the next mapping, it must not be in a map.
+            # Therefore, it maps to itself.
+            new_list.append(curr_int)
+            i += 1
+        else:
+            # if curr_int >= curr_map_source_range_start:
+            curr_map_range_length = curr_map[2]
+            curr_map_source_range_end = (
+                curr_map_source_range_start + curr_map_range_length - 1
+            )
+            if curr_int <= curr_map_source_range_end:
+                # Integer is in range!
+                curr_map_dest_range_start = curr_map[0]
+                difference = curr_map_dest_range_start - curr_map_source_range_start
+                new_list.append(curr_int + difference)
+                i += 1
+            else:
+                # Integer is bigger than this map, move on
+                m += 1
+
+    # If there are any more items in the int map, they are bigger than any map,
+    # so they map to themselves. Add to the new list.
+    while i < len(int_list):
+        new_list.append(int_list[i])
+        i += 1
+
+    return new_list
