@@ -7,10 +7,10 @@ location number that corresponds to any of the initial seeds.
 Some docstrings written with help of GitHub copilot.
 """
 
-from typing import List, Tuple
+from typing import List, Tuple, Dict
 
-# FILE_PATH = "Day5/input.txt"
-FILE_PATH = "Day5/example.txt"
+FILE_PATH = "Day5/input.txt"
+# FILE_PATH = "Day5/example.txt"
 
 
 def merge_map(
@@ -193,3 +193,89 @@ def map_via_merge_sort(
         i += 1
 
     return new_list
+
+
+def convert_line_to_map_item(line: str) -> Tuple[int, int, int]:
+    """Converts a line from the input file into a map item.
+
+    Args:
+        line (str): Line from input file
+
+    Returns:
+        Tuple[int, int, int]: Map item
+    """
+    numbers = line.split()
+    return tuple(int(num) for num in numbers)
+
+
+def parse_file(
+    file_path: str,
+) -> Tuple[List[int], Dict[str, List[Tuple[int, int, int]]]]:
+    """Parses the input file into a list of seeds and a list of mappings.
+
+    Args:
+        file_path (str): Path to input file
+
+    Returns:
+        Tuple[
+            List[int],
+            Dict[str, List[Tuple[int, int, int]]]
+        ]:
+            Tuple of seeds and mappings
+    """
+
+    # Get contents of file and store as table
+    file = open(file_path, "r")
+    lines = file.readlines()
+    file.close()
+
+    # Get initial list of seeds
+    seed_list = (lines[0].split(":"))[1].split()
+    # Convert to integers
+    seed_list = [int(item) for item in seed_list]
+
+    # Get list of maps
+    map_dictionary: Dict[str, List[Tuple[int, int, int]]] = {}
+    current_map_key = ""
+    for line in lines[2::]:
+        # Skip newlines
+        if line.strip() == "":
+            continue
+
+        # Check if is heading, i.e. not digit
+        if not "".join(line.split()).isdigit():
+            # Set new key for dictionary
+            current_map_key = line.split()[0]
+            map_dictionary[current_map_key] = []
+        # Otherwise, map item
+        else:
+            map_dictionary[current_map_key].append(convert_line_to_map_item(line))
+
+    return (seed_list, map_dictionary)
+
+
+def print_smallest_location(
+    seed_list: List[int], map_dictionary: Dict[str, List[Tuple[int, int, int]]]
+) -> None:
+    """Prints the smallest location number that corresponds to any of the initial seeds.
+
+    Args:
+        seeds (List[int]): List of initial seeds
+        mappings (Dict[str, List[Tuple[int, int, int]]]): Dictionary of mappings
+
+    Returns:
+        None
+    """
+    # Want to run integer list through each mapping, using merge mapping technique
+    int_list = seed_list
+    for map_key in map_dictionary.keys():
+        int_list = merge_sort_list(int_list)
+        mapping = merge_sort_map(map_dictionary[map_key])
+
+        int_list = map_via_merge_sort(int_list, mapping)
+
+    print("Lowest location number:", min(int_list))
+
+
+seeds, maps = parse_file(FILE_PATH)
+print_smallest_location(seeds, maps)
