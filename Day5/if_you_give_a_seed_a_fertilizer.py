@@ -16,7 +16,8 @@ FILE_PATH = "Day5/example.txt"
 def merge_map(
     left: List[Tuple[int, int, int]], right: List[Tuple[int, int, int]]
 ) -> List[Tuple[int, int, int]]:
-    """Merges two sorted maps (based on first item of tuple) into one sorted map.
+    """Merges two sorted maps (based on second item of tuple) into one sorted map.
+    Maps are organized (destination range start, source range start, range length).
 
     Args:
         left (List[Tuple[int, int, int]]): Left sorted map
@@ -31,7 +32,7 @@ def merge_map(
 
     new_list = []
     while li < len(left) and ri < len(right):
-        if left[li][0] <= right[ri][0]:
+        if left[li][1] <= right[ri][1]:
             new_list.append(left[li])
             li += 1
         else:
@@ -53,7 +54,9 @@ def merge_map(
 
 
 def merge_sort_map(map_list: List[Tuple[int, int, int]]) -> List[Tuple[int, int, int]]:
-    """Sorts a mapping list based on the first item of each tuple in the list.
+    """Sorts a mapping list based on the second item of each tuple in the list.
+    Maps are organized (destination range start, source range start, range length).
+
 
     Args:
         map_list (List[Tuple[int, int, int]]): List of mappings to be sorted
