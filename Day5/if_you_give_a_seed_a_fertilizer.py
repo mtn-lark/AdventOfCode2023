@@ -7,24 +7,25 @@ location number that corresponds to any of the initial seeds.
 Some docstrings written with help of GitHub copilot.
 """
 
-from typing import List, Tuple, Dict
+from typing import List, Tuple, Dict, TypeAlias
 
 FILE_PATH = "Day5/input.txt"
 # FILE_PATH = "Day5/example.txt"
 
+MapTuple: TypeAlias = Tuple[int, int, int]
+# destination range start, source range start, range length
 
-def merge_map(
-    left: List[Tuple[int, int, int]], right: List[Tuple[int, int, int]]
-) -> List[Tuple[int, int, int]]:
+
+def merge_map(left: List[MapTuple], right: List[MapTuple]) -> List[MapTuple]:
     """Merges two sorted maps (based on second item of tuple) into one sorted map.
     Maps are organized (destination range start, source range start, range length).
 
     Args:
-        left (List[Tuple[int, int, int]]): Left sorted map
-        right (List[Tuple[int, int, int]]): Right sorted map
+        left (List[MapTuple]): Left sorted map
+        right (List[MapTuple]): Right sorted map
 
     Returns:
-        List[Tuple[int, int, int]]: Merged sorted map
+        List[MapTuple]: Merged sorted map
     """
 
     li = 0  # Left pointer index
@@ -53,16 +54,16 @@ def merge_map(
     return new_list
 
 
-def merge_sort_map(map_list: List[Tuple[int, int, int]]) -> List[Tuple[int, int, int]]:
+def merge_sort_map(map_list: List[MapTuple]) -> List[MapTuple]:
     """Sorts a mapping list based on the second item of each tuple in the list.
     Maps are organized (destination range start, source range start, range length).
 
 
     Args:
-        map_list (List[Tuple[int, int, int]]): List of mappings to be sorted
+        map_list (List[MapTuple]): List of mappings to be sorted
 
     Returns:
-        List[Tuple[int, int, int]]: Sorted list of mappings
+        List[MapTuple]: Sorted list of mappings
     """
 
     if len(map_list) == 1:
@@ -139,15 +140,13 @@ def merge_sort_list(int_list: List[int]) -> List[int]:
     return merge
 
 
-def map_via_merge_sort(
-    int_list: List[int], map_list: List[Tuple[int, int, int]]
-) -> List[int]:
+def map_via_merge_sort(int_list: List[int], map_list: List[MapTuple]) -> List[int]:
     """Maps a sorted list of integers using a sorted list of mappings.
     Maps are organized (destination range start, source range start, range length).
 
     Args:
         int_list (List[int]): Sorted list of integers
-        map_list (List[Tuple[int, int, int]]): Sorted list of mappings
+        map_list (List[MapTuple]): Sorted list of mappings
 
     Returns:
         List[int]: Mapped list of integers
@@ -195,14 +194,14 @@ def map_via_merge_sort(
     return new_list
 
 
-def convert_line_to_map_item(line: str) -> Tuple[int, int, int]:
+def convert_line_to_map_item(line: str) -> MapTuple:
     """Converts a line from the input file into a map item.
 
     Args:
         line (str): Line from input file
 
     Returns:
-        Tuple[int, int, int]: Map item
+        MapTuple: Map item
     """
     numbers = line.split()
     return tuple(int(num) for num in numbers)
@@ -210,7 +209,7 @@ def convert_line_to_map_item(line: str) -> Tuple[int, int, int]:
 
 def parse_file(
     file_path: str,
-) -> Tuple[List[int], Dict[str, List[Tuple[int, int, int]]]]:
+) -> Tuple[List[int], Dict[str, List[MapTuple]]]:
     """Parses the input file into a list of seeds and a list of mappings.
 
     Args:
@@ -219,7 +218,7 @@ def parse_file(
     Returns:
         Tuple[
             List[int],
-            Dict[str, List[Tuple[int, int, int]]]
+            Dict[str, List[MapTuple]]
         ]:
             Tuple of seeds and mappings
     """
@@ -235,7 +234,7 @@ def parse_file(
     seed_list = [int(item) for item in seed_list]
 
     # Get list of maps
-    map_dictionary: Dict[str, List[Tuple[int, int, int]]] = {}
+    map_dictionary: Dict[str, List[MapTuple]] = {}
     current_map_key = ""
     for line in lines[2::]:
         # Skip newlines
@@ -255,13 +254,13 @@ def parse_file(
 
 
 def print_smallest_location(
-    seed_list: List[int], map_dictionary: Dict[str, List[Tuple[int, int, int]]]
+    seed_list: List[int], map_dictionary: Dict[str, List[MapTuple]]
 ) -> None:
     """Prints the smallest location number that corresponds to any of the initial seeds.
 
     Args:
         seeds (List[int]): List of initial seeds
-        mappings (Dict[str, List[Tuple[int, int, int]]]): Dictionary of mappings
+        mappings (Dict[str, List[MapTuple]]): Dictionary of mappings
 
     Returns:
         None
@@ -269,6 +268,8 @@ def print_smallest_location(
     # Want to run integer list through each mapping, using merge mapping technique
     int_list = seed_list
     for map_key in map_dictionary.keys():
+        # Python dictionaries are ordered by the order in which keys were added
+        # So we know location map is last
         int_list = merge_sort_list(int_list)
         mapping = merge_sort_map(map_dictionary[map_key])
 
