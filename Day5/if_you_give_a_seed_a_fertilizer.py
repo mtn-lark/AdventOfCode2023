@@ -14,7 +14,15 @@ FILE_PATH = "Day5/example.txt"
 
 
 def merge_list(left: List[int], right: List[int]) -> List[int]:
-    """Merges two sorted lists into one sorted list."""
+    """Merges two sorted lists into one sorted list.
+
+    Args:
+        left (List[int]): Left sorted list
+        right (List[int]): Right sorted list
+
+    Returns:
+        List[int]: Merged sorted list
+    """
     # Psuedocode from geeksforgeeks.org/merge-sort/
 
     li = 0  # Left pointer index
@@ -47,10 +55,10 @@ def merge_sort_list(int_list: List[int]) -> List[int]:
     """Sorts a list of integers using merge sort.
 
     Args:
-        int_list: List of integers to be sorted
+        int_list (List[int]): List of integers to be sorted
 
     Returns:
-        list
+        List[int]: Sorted list of integers
     """
 
     if len(int_list) == 1:
