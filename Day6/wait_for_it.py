@@ -4,15 +4,41 @@ Boat races! For a given race with n seconds, the time is split between charging
 the boat's velocity (which gives 1 unit of distance per unit of time) and
 moving based on the velocity charged (assume instant acceleration).
 Part 1:
-Find the number of ways to win races by beating the record.
+Find the number of ways to win each of the races by beating the record.
+Part 2:
+Kerning is off! It's just one race. Find the number of ways to win by beating
+the record.
 
 Some docstrings written with help of GitHub copilot.
 """
 
-from typing import List
+from typing import List, Tuple
+from math import sqrt, floor
 
 FILE_PATH = "Day6/input.txt"
 # FILE_PATH = "Day6/example.txt"
+
+
+def solve_quadratic(a: int, b: int, c: int) -> Tuple[float, float] | None:
+    """
+    Solve a quadratic equation of the form ax^2 + bx + c = 0.
+
+    Args:
+        a (int): Coefficient of x^2.
+        b (int): Coefficient of x.
+        c (int): Constant term.
+
+    Returns:
+        Tuple[float, float]: The two solutions of the quadratic equation.
+    """
+    discriminant = b**2 - 4 * a * c
+    if discriminant < 0:
+        return None
+
+    solution1 = (-b + sqrt(discriminant)) / (2 * a)
+    solution2 = (-b - sqrt(discriminant)) / (2 * a)
+
+    return (solution1, solution2)
 
 
 def get_distance(time_waited: int, time_total: int) -> int:
@@ -41,54 +67,55 @@ def get_num_ways_to_win(time: int, dist: int) -> int:
         int: The number of ways to win.
     """
 
-    count = 0
-
-    # The distance traveled can be represented as x * (t - x),
+    # The distance traveled can be represented as x * (t - x) = -x^2 + tx,
     # where x is the time waited and t is the overall time.
-    # So, this is a parabola maximized when x = t/2,
-    # such that the distance traveled is (t/2)^2.
-    t_max = time // 2
-    print(t_max)
+    # We can subtract the record distance d to get -x^2 + tx - d.
+    # This is a quadratic where the solutions represent the amount of time
+    # needed to charge to match the record distance; so, the number of ways to
+    # win is the number of integers between those two solutions.
 
-    if t_max * (time - t_max) > dist:
-        count += 1
-        for i in range(1, time - t_max):
-            t_right = t_max + i
-            t_left = t_max - i
+    solution = solve_quadratic(-1, time, -dist)
+    if not solution:
+        return 0
 
-            d_right = get_distance(t_right, time)
-            d_left = get_distance(t_left, time)
-
-            if not (d_left > dist or d_right > dist):
-                # These charge times don't work, and since the function is
-                # decreasing in the directions we're moving, we're not going
-                # to find more solutions
-                break
-
-            if d_right > dist:
-                count += 1
-            if d_left > dist:
-                count += 1
-        return count
-    else:
-        # Even the highest value doesn't beat the record
-        return count
+    sol1, sol2 = solution
+    # if sol1 < sol2, the number of ints between the solutions would be
+    # floor(sol2) - ciel(sol1), +1 to include the upper bound.
+    # However, we can just floor both and take the absolute value to avoid
+    # comparing and automatically include the bounds.
+    return abs(floor(sol1) - floor(sol2))
 
 
 # Set up variables
 times: List[int] = []
 distances: List[int] = []
 
-# Parse file
-file = open(FILE_PATH, "r")
-times = [int(x) for x in (file.readline().split()[1::])]
-distances = [int(x) for x in (file.readline().split()[1::])]
-file.close()
 
-running_product = 1
-for i in range(len(times)):
-    running_product *= get_num_ways_to_win(times[i], distances[i])
+def get_part_1():
+    # Parse file
+    file = open(FILE_PATH, "r")
+    times = [int(x) for x in (file.readline().split()[1::])]
+    distances = [int(x) for x in (file.readline().split()[1::])]
+    file.close()
 
-print(running_product)
+    running_product = 1
+    for i in range(len(times)):
+        running_product *= get_num_ways_to_win(times[i], distances[i])
 
-# 31500 too low
+    print("Part 1:", running_product)
+
+
+def get_part_2():
+    # Parse file
+    file = open(FILE_PATH, "r")
+    # Kerning is bad! It's just one number!
+    # Get everything after the colon, replace all the spaces with empty, and
+    # cast to int.
+    time = int(file.readline().split(":")[1].replace(" ", ""))
+    dist = int(file.readline().split(":")[1].replace(" ", ""))
+
+    print("Part 2:", get_num_ways_to_win(time, dist))
+
+
+get_part_1()
+get_part_2()
